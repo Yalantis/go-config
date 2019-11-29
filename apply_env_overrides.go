@@ -50,7 +50,6 @@ func applyEnvOverridesToSlice(prefix string, dst interface{}) error {
 		return fmt.Errorf("unsettable type: %s %s at prefix: %s", rv.Type(), riv.Type(), prefix)
 	}
 
-	zero := rv.IsZero()
 	parseKeyVal, err := regexp.Compile(prefix + "_(\\d+)_(\\w+)=(.+)")
 	if err != nil {
 		return err
@@ -60,7 +59,7 @@ func applyEnvOverridesToSlice(prefix string, dst interface{}) error {
 	mapConfigs := make(map[int]reflect.Value)
 	envs := environ()
 
-	if !zero {
+	if !isZero(rv) {
 		l := riv.Len()
 		for i := 0; i < l; i++ {
 			value := reflect.Indirect(riv.Index(i))
@@ -86,7 +85,6 @@ func applyEnvOverridesToSlice(prefix string, dst interface{}) error {
 
 			i := int(index)
 			envKey := matches[2]
-			name := ToCamelCase(matches[2])
 			value := matches[3]
 
 			if _, ok := mapConfigs[i]; !ok {
@@ -103,6 +101,7 @@ func applyEnvOverridesToSlice(prefix string, dst interface{}) error {
 			f, ok := fieldByEnvconfig(v, envKey)
 			if !ok {
 				// fallback in case field with
+				name := ToCamelCase(matches[2])
 				f = v.FieldByName(name)
 				if (f == reflect.Value{}) {
 					return fmt.Errorf("field %s not found", name)
@@ -172,7 +171,7 @@ func applyDefaultToEmpty(t reflect.StructField, v reflect.Value) error {
 		return nil
 	}
 
-	if !isEmpty(v) {
+	if !isZero(v) {
 		return nil
 	}
 

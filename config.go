@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"math"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -87,7 +88,7 @@ func validateField(t reflect.StructField, v reflect.Value) (invalidFields []stri
 		return invalidFields
 	}
 
-	if isEmpty(v) {
+	if isZero(v) {
 		invalidFields = append(invalidFields, t.Name)
 	}
 
@@ -282,7 +283,7 @@ func isZeroTime(date time.Time) bool {
 	return date.IsZero() || date.Equal(unixEpochTime)
 }
 
-func isEmpty(v reflect.Value) bool {
+func isZero(v reflect.Value) bool {
 	switch v.Type() {
 	case timeType:
 		return isZeroTime(v.Interface().(time.Time))
@@ -293,15 +294,18 @@ func isEmpty(v reflect.Value) bool {
 	}
 
 	switch v.Kind() {
-	case reflect.Slice, reflect.String:
+	case reflect.Bool:
+		return !v.Bool()
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		return v.Int() == 0
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
+		return v.Uint() == 0
+	case reflect.Float32, reflect.Float64:
+		return math.Float64bits(v.Float()) == 0
+	case reflect.Interface, reflect.Ptr, reflect.Slice:
+		return v.IsNil()
+	case reflect.String:
 		return v.Len() == 0
-	case reflect.Int, reflect.Int32, reflect.Int64, reflect.Uint, reflect.Uint32, reflect.Uint64:
-		return v.Interface() == 0
-	case reflect.Ptr:
-		if v.IsNil() {
-			return true
-		}
-		return isEmpty(v.Elem())
 	}
 	zero := reflect.Zero(v.Type())
 	return reflect.DeepEqual(v.Interface(), zero.Interface())
