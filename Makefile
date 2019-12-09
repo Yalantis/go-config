@@ -1,8 +1,11 @@
-test: ## Run unit tests
-	go test -count=1 -short ./...
+test:
+	go test -race -v ./...
 
-cover: dep
+bench:
+	go test -run="^$$" -bench=.
+
+cover:
 	go test $(shell go list ./... | grep -v /vendor/;) -cover -v
 
-dep: ## Get the dependencies
+dep:
 	GO111MODULE=on go mod vendor

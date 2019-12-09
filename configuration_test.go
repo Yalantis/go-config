@@ -33,7 +33,7 @@ func TestInitOnConfiguration(t *testing.T) {
 			name:   "not pointer",
 			value:  Configuration{},
 			expect: Configuration{},
-			err:    ErrDstNotPointer,
+			err:    ErrNotPointer,
 		},
 		{
 			name:   "fail on time.ParseDuration",

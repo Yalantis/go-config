@@ -1,8 +1,10 @@
 package config
 
-import "syscall"
+import "os"
 
-var lookupEnv = syscall.Getenv
-var environ = syscall.Environ
-var Setenv = syscall.Setenv
-var Unsetenv = syscall.Unsetenv
+var lookupEnv = os.LookupEnv
+var environ = os.Environ
+var Setenv = os.Setenv
+var Unsetenv = os.Unsetenv
+
+//var ExpandEnv = os.ExpandEnv

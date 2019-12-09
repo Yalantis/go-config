@@ -31,7 +31,7 @@ func TestInit(t *testing.T) {
 			name:     "not a pointer",
 			filePath: "",
 			cfg:      cfg,
-			error:    ErrDstNotPointer.Error(),
+			error:    ErrNotPointer.Error(),
 		},
 		{
 			name:     "not a struct",

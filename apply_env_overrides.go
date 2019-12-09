@@ -10,9 +10,9 @@ import (
 )
 
 var (
-	ErrDstNotSlice    = errors.New("dst must be a slice")
+	ErrNotSlice       = errors.New("should be a slice")
+	ErrNotSettable    = errors.New("should be settable")
 	ErrPrefixRequired = errors.New("prefix is required")
-	ErrDstUnsettable  = errors.New("unsetable dst value")
 )
 
 var camelCaseRegex = regexp.MustCompile("(^[A-Za-z])|_([A-Za-z])")
@@ -35,7 +35,7 @@ func applyEnvOverridesToSlice(prefix string, dst interface{}) error {
 		// fallback
 		rv = reflect.ValueOf(dst)
 		if rv.Kind() != reflect.Ptr {
-			return ErrDstNotPointer
+			return ErrNotPointer
 		}
 	}
 
@@ -43,11 +43,11 @@ func applyEnvOverridesToSlice(prefix string, dst interface{}) error {
 	rit := indirectType(riv.Type())
 
 	if rit.Kind() != reflect.Slice {
-		return ErrDstNotSlice
+		return ErrNotSlice
 	}
 
 	if !rv.CanSet() && !riv.CanSet() {
-		return fmt.Errorf("unsettable type: %s %s at prefix: %s", rv.Type(), riv.Type(), prefix)
+		return fmt.Errorf("not settable type: %s %s at prefix: %s: %v", rv.Type(), riv.Type(), prefix, ErrNotSettable)
 	}
 
 	parseKeyVal, err := regexp.Compile(prefix + "_(\\d+)_(\\w+)=(.+)")
@@ -132,12 +132,8 @@ func applyEnvOverridesToSlice(prefix string, dst interface{}) error {
 		return nil
 	}
 
-	if riv.CanSet() {
-		setPtrValue(riv, ptr, tmp)
-		return nil
-	}
-
-	return ErrDstUnsettable
+	setPtrValue(riv, ptr, tmp)
+	return nil
 }
 
 // setPtrValue set as Ptr or Value

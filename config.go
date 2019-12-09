@@ -14,8 +14,8 @@ import (
 )
 
 var (
-	ErrDstNotPointer = errors.New("dst should be a pointer")
-	ErrNotStruct     = errors.New("should be a structure")
+	ErrNotPointer = errors.New("should be a pointer")
+	ErrNotStruct  = errors.New("should be a structure")
 )
 
 var (
@@ -28,6 +28,7 @@ var (
 const (
 	envConfigTag = "envconfig"
 	envPrefixTag = "envprefix"
+	defaultTag   = "default"
 )
 
 // Init reads and init configuration to `config` variable, which must be a reference of struct
@@ -35,7 +36,7 @@ func Init(config interface{}, filename string) error {
 	v := reflect.ValueOf(config)
 
 	if v.Kind() != reflect.Ptr {
-		return ErrDstNotPointer
+		return ErrNotPointer
 	}
 
 	v = reflect.Indirect(v)
@@ -106,7 +107,7 @@ func applyDefault(t reflect.StructField, v reflect.Value) error {
 		return nil
 	}
 
-	value, ok := t.Tag.Lookup("default")
+	value, ok := t.Tag.Lookup(defaultTag)
 	if !ok {
 		return nil
 	}
@@ -167,8 +168,11 @@ func applyEnv(v reflect.Value) error {
 }
 
 func applyEnvValue(t reflect.StructField, v reflect.Value) error {
-	if value, ok := t.Tag.Lookup(envPrefixTag); ok && indirectType(v.Type()).Kind() == reflect.Slice {
-		return applyEnvOverridesToSlice(value, v)
+	switch indirectType(v.Type()).Kind() {
+	case reflect.Slice:
+		if value, ok := t.Tag.Lookup(envPrefixTag); ok {
+			return applyEnvOverridesToSlice(value, v)
+		}
 	}
 
 	if v.Kind() == reflect.Struct && !isTime(v.Type()) {

@@ -6,18 +6,21 @@
     "password": "12345"
   },
   "redis": {
-    "addrs": "127.0.0.1:6374,127.0.0.1:6375,127.0.0.1:6376,127.0.0.1:6377,127.0.0.1:6378,127.0.0.1:6379",
+    "addrs": [
+      "127.0.0.1:6374",
+      "127.0.0.1:6375",
+      "127.0.0.1:6376",
+      "127.0.0.1:6377",
+      "127.0.0.1:6378",
+      "127.0.0.1:6379"
+    ],
     "password": "",
     "db": 1,
     "pool_size": 10
   },
   "nats": {
-    "server_urls": "nats://localhost:4222",
+    "server_url": "nats://localhost:4222",
     "max_reconnection_attempts": 5,
-    "reconnect_interval_sec": 2
-  },
-  "websocket": {
-    "port": "9876",
-    "in_messages_chan_size": 5000
+    "reconnect_interval": "2s"
   }
 }

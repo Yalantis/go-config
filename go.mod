@@ -1,5 +1,5 @@
-module gitlab.yalantis.com/gophers/config
+module github.com/Yalantis/go-config
 
-require github.com/stretchr/testify v1.3.0
+go 1.13
 
-go 1.11+
+require github.com/stretchr/testify v1.4.0

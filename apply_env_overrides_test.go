@@ -62,13 +62,13 @@ func TestApplyEnvOverridesToSlice(t *testing.T) {
 			name:   "not a pointer",
 			prefix: "PREFIX_S",
 			value:  []Payload{},
-			err:    ErrDstNotPointer,
+			err:    ErrNotPointer,
 		},
 		{
 			name:   "not a slice",
 			prefix: "PREFIX_S",
 			value:  new(int),
-			err:    ErrDstNotSlice,
+			err:    ErrNotSlice,
 		},
 		{
 			name:   "fail on time.ParseDuration",
